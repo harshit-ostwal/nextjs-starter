@@ -12,7 +12,7 @@
 
 ## Features
 
-- **Next.js 14+** with App Router
+- **Next.js 15.5.0** with App Router
 - Modular folder structure (`src/animations`, `src/assets`, `src/components`, etc.)
 - Reusable UI components (Accordion, Button, Card, Table, etc.)
 - Context, hooks, and helpers for state management and utilities
@@ -21,6 +21,12 @@
 - Global styles and custom fonts
 - Linting and formatting with ESLint, Prettier, and lint-staged
 - PostCSS for advanced CSS processing
+- Husky for Git hooks
+- Tailwind CSS for utility-first styling
+- Prettier and Prettier-plugin-tailwindcss for code formatting
+- Embla Carousel, Recharts, Lucide, Tabler Icons, and more for UI/UX enhancements
+- Zod for schema validation
+- React Query for data fetching
 
 ---
 
@@ -82,9 +88,43 @@ src/
 ## Scripts
 
 - `pnpm dev` — Start development server
-- `pnpm build` — Build for production
+- `pnpm build` — Run lint, format, and build for production
 - `pnpm lint` — Run ESLint
 - `pnpm format` — Format code with Prettier
+- `pnpm check-format` — Check code formatting
+- `pnpm prepare` — Prepare Husky hooks
+- `pnpm start` — Start production server
+
+---
+
+## Dependencies
+
+### Main
+
+- next@15.5.0
+- react@19.1.0, react-dom@19.1.0
+- axios
+- @tanstack/react-query, @tanstack/react-query-devtools
+- @radix-ui/react-\* (Accordion, Dialog, Tabs, etc.)
+- @tabler/icons-react, lucide-react
+- embla-carousel-react
+- recharts
+- zod
+- input-otp
+- sonner
+- tailwind-merge
+- next-themes
+- date-fns
+- class-variance-authority, clsx
+- vaul
+
+### Dev
+
+- eslint, eslint-config-next, eslint-config-prettier, eslint-plugin-react-hooks, @tanstack/eslint-plugin-query, @eslint/eslintrc
+- prettier, prettier-plugin-tailwindcss
+- husky
+- lint-staged
+- tailwindcss, @tailwindcss/postcss, tw-animate-css
 
 ---
 
@@ -93,6 +133,7 @@ src/
 - ESLint config: `eslint.config.mjs`
 - Prettier: integrated via lint-staged
 - Lint-staged: `lint-staged.config.js`
+- Husky for pre-commit hooks
 
 ---
 
@@ -102,6 +143,7 @@ src/
 - Add new routes in `src/app/(routes)/`
 - Update global styles in `src/components/styles/globals.css`
 - Configure Axios in `src/components/lib/axios.js`
+- Add/modify validation schemas in `src/components/schema/`
 
 ---
 
