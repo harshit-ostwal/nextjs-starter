@@ -1,6 +1,6 @@
 # Next.js Starter
 
-[![Next.js](https://img.shields.io/badge/Next.js-14%2B-blue?logo=next.js)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16%2B-blue?logo=next.js)](https://nextjs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-%E2%9C%94-green?logo=pnpm)](https://pnpm.io/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?logo=prettier)](https://prettier.io/)
@@ -12,7 +12,7 @@
 
 ## Features
 
-- **Next.js 14+** with App Router
+- **Next.js 16+** with App Router
 - Modular folder structure (`src/animations`, `src/assets`, `src/components`, etc.)
 - Reusable UI components (Accordion, Button, Card, Table, etc.)
 - Context, hooks, and helpers for state management and utilities
@@ -28,7 +28,7 @@
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 22+
 - pnpm (recommended) or npm/yarn
 
 ### Installation
