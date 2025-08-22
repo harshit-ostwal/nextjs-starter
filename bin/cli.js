@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 import { execSync } from "child_process";
-import { existsSync, mkdirSync } from "fs";
+import { existsSync, mkdirSync, cpSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import os from "os";
+import ora from "ora";
+import chalk from "chalk";
+import readline from "readline";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,39 +17,79 @@ function runCommand(command, options = {}) {
   try {
     execSync(command, { stdio: "inherit", ...options });
   } catch (err) {
-    console.error(`❌ Failed to run command: ${command}`);
+    console.error(chalk.red(`❌ Failed to run: ${command}`));
     process.exit(1);
   }
 }
 
-try {
-  execSync("pnpm -v", { stdio: "ignore" });
-} catch {
-  console.error("❌ pnpm is not installed. Please install it first:");
-  console.error("   npm install -g pnpm");
-  process.exit(1);
+// Ask user a question (sync-like prompt)
+function askQuestion(query) {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+  return new Promise((resolve) =>
+    rl.question(query, (ans) => {
+      rl.close();
+      resolve(ans.trim());
+    })
+  );
 }
 
-if (existsSync(projectPath)) {
-  console.error(`❌ Folder "${projectName}" already exists.`);
-  process.exit(1);
+async function main() {
+  // Check if project folder already exists
+  if (existsSync(projectPath)) {
+    console.error(chalk.red(`❌ Folder "${projectName}" already exists.`));
+    process.exit(1);
+  }
+
+  const spinner = ora(
+    `Creating Next.js app in ${chalk.cyan(projectName)}...`
+  ).start();
+
+  // Create dir + copy template
+  mkdirSync(projectPath);
+  const templateDir = path.join(__dirname, "../template");
+  cpSync(templateDir, projectPath, { recursive: true });
+
+  // Init git
+  spinner.text = "Initializing Git repository...";
+  runCommand("git init", { cwd: projectPath });
+
+  spinner.stop();
+
+  // Ask for package manager
+  const pm = (
+    await askQuestion(
+      chalk.yellow(
+        "👉 Which package manager do you want to use? (npm / pnpm / yarn / bun): "
+      )
+    )
+  ).toLowerCase();
+
+  const validPMs = ["npm", "pnpm", "yarn", "bun"];
+  if (!validPMs.includes(pm)) {
+    console.error(chalk.red(`❌ Invalid choice: ${pm}`));
+    process.exit(1);
+  }
+
+  console.log(chalk.cyan(`📦 Installing dependencies with ${pm}...`));
+
+  // Run correct install
+  if (pm === "npm") {
+    runCommand("npm install", { cwd: projectPath });
+  } else if (pm === "pnpm") {
+    runCommand("pnpm install", { cwd: projectPath });
+  } else if (pm === "yarn") {
+    runCommand("yarn install", { cwd: projectPath });
+  } else if (pm === "bun") {
+    runCommand("bun install", { cwd: projectPath });
+  }
+
+  console.log(chalk.green("\n✅ Success!"));
+  console.log(`\nNext steps:\n`);
+  console.log(`  ${chalk.cyan("cd")} ${projectName}`);
+  console.log(`  ${chalk.cyan(`${pm} dev`)}\n`);
 }
 
-console.log(`🚀 Creating Next.js app in "${projectName}"...`);
-mkdirSync(projectPath);
-
-const templateDir = path.join(__dirname, "../template");
-if (os.platform() === "win32") {
-  runCommand(`xcopy "${templateDir}" "${projectPath}" /E /I /Q`);
-} else {
-  runCommand(`cp -r ${templateDir}/. ${projectPath}`);
-}
-
-runCommand("git init", { cwd: projectPath });
-
-console.log("📦 Installing dependencies...");
-runCommand("pnpm install --shamefully-hoist", { cwd: projectPath });
-
-console.log(`\n✅ All done!`);
-console.log(`👉 cd ${projectName}`);
-console.log(`👉 pnpm dev (or npm run dev)\n`);
+main();
