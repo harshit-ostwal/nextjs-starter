@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const projectName = process.argv[2] || "my-app";
 const targetDir = path.join(process.cwd(), projectName);
