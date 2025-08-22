@@ -5,50 +5,58 @@ import path from "path";
 import { fileURLToPath } from "url";
 import ora from "ora";
 import chalk from "chalk";
-import readline from "readline";
+import prompts from "prompts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const projectName = process.argv[2] || "my-app";
-const projectPath = path.resolve(process.cwd(), projectName);
-
 function runCommand(command, options = {}) {
   try {
     execSync(command, { stdio: "inherit", ...options });
-  } catch (err) {
+  } catch {
     console.error(chalk.red(`❌ Failed to run: ${command}`));
     process.exit(1);
   }
 }
 
-// Ask user a question (sync-like prompt)
-function askQuestion(query) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  return new Promise((resolve) =>
-    rl.question(query, (ans) => {
-      rl.close();
-      resolve(ans.trim());
-    })
-  );
-}
-
 async function main() {
-  // Check if project folder already exists
+  // Step 1: Ask for project name
+  const { projectName } = await prompts({
+    type: "text",
+    name: "projectName",
+    message: "What is your project named?",
+    initial: "my-app",
+  });
+
+  const projectPath = path.resolve(process.cwd(), projectName);
+
   if (existsSync(projectPath)) {
     console.error(chalk.red(`❌ Folder "${projectName}" already exists.`));
     process.exit(1);
   }
 
+  // Step 2: Ask for package manager
+  const { packageManager } = await prompts({
+    type: "select",
+    name: "packageManager",
+    message: "Which package manager would you like to use?",
+    choices: [
+      { title: "pnpm (recommended)", value: "pnpm" },
+      { title: "npm", value: "npm" },
+      { title: "yarn", value: "yarn" },
+      { title: "bun", value: "bun" },
+    ],
+    initial: 0,
+  });
+
+  // Step 3: Start spinner
   const spinner = ora(
     `Creating Next.js app in ${chalk.cyan(projectName)}...`
   ).start();
 
-  // Create dir + copy template
   mkdirSync(projectPath);
+
+  // Copy template files (keeps empty folders too)
   const templateDir = path.join(__dirname, "../template");
   cpSync(templateDir, projectPath, { recursive: true });
 
@@ -58,38 +66,26 @@ async function main() {
 
   spinner.stop();
 
-  // Ask for package manager
-  const pm = (
-    await askQuestion(
-      chalk.yellow(
-        "👉 Which package manager do you want to use? (npm / pnpm / yarn / bun): "
-      )
-    )
-  ).toLowerCase();
+  // Step 4: Install dependencies
+  console.log(
+    chalk.cyan(`📦 Installing dependencies with ${packageManager}...`)
+  );
 
-  const validPMs = ["npm", "pnpm", "yarn", "bun"];
-  if (!validPMs.includes(pm)) {
-    console.error(chalk.red(`❌ Invalid choice: ${pm}`));
-    process.exit(1);
-  }
-
-  console.log(chalk.cyan(`📦 Installing dependencies with ${pm}...`));
-
-  // Run correct install
-  if (pm === "npm") {
+  if (packageManager === "npm") {
     runCommand("npm install", { cwd: projectPath });
-  } else if (pm === "pnpm") {
+  } else if (packageManager === "pnpm") {
     runCommand("pnpm install", { cwd: projectPath });
-  } else if (pm === "yarn") {
+  } else if (packageManager === "yarn") {
     runCommand("yarn install", { cwd: projectPath });
-  } else if (pm === "bun") {
+  } else if (packageManager === "bun") {
     runCommand("bun install", { cwd: projectPath });
   }
 
+  // Step 5: Success
   console.log(chalk.green("\n✅ Success!"));
   console.log(`\nNext steps:\n`);
   console.log(`  ${chalk.cyan("cd")} ${projectName}`);
-  console.log(`  ${chalk.cyan(`${pm} dev`)}\n`);
+  console.log(`  ${chalk.cyan(`${packageManager} dev`)}\n`);
 }
 
 main();
