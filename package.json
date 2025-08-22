@@ -2,6 +2,15 @@
     "name": "nextjs-starter-kit",
     "version": "0.1.1",
     "private": false,
+    "bin": {
+        "create-nextjs-starter-kit": "./bin/cli.js"
+    },
+    "files": [
+        "bin",
+        "template",
+        "package.json",
+        "README.md"
+    ],
     "scripts": {
         "dev": "next dev --turbopack",
         "build": "pnpm lint && pnpm format &&  next build --turbopack",
