@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { execSync } from "child_process";
-import { existsSync, mkdirSync, cpSync, readFileSync } from "fs";
+import { existsSync, mkdirSync, cpSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import ora from "ora";
@@ -20,74 +20,6 @@ function runCommand(command, options = {}) {
   } catch {
     return null;
   }
-}
-
-// Fetch latest version of a package
-function getLatestVersion(pkgName, packageManager) {
-  try {
-    if (packageManager === "pnpm" || packageManager === "npm") {
-      return runCommand(`${packageManager} view ${pkgName} version`);
-    } else if (packageManager === "yarn") {
-      return runCommand(`yarn info ${pkgName} version`);
-    } else if (packageManager === "bun") {
-      return runCommand(`bun info ${pkgName} version`);
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-// Print dependencies summary
-function printPackageSummary(projectPath, packageManager) {
-  const pkgJsonPath = path.join(projectPath, "package.json");
-  if (!existsSync(pkgJsonPath)) return;
-
-  const pkg = JSON.parse(readFileSync(pkgJsonPath, "utf-8"));
-  const dependencies = pkg.dependencies || {};
-  const devDependencies = pkg.devDependencies || {};
-
-  const depNames = Object.keys(dependencies);
-  const devDepNames = Object.keys(devDependencies);
-  const totalPackages = depNames.length + devDepNames.length;
-
-  console.log(chalk.cyan("\nInstalling dependencies:"));
-  depNames.forEach((dep) => console.log(`- ${dep}`));
-
-  console.log(chalk.cyan("\nInstalling devDependencies:"));
-  devDepNames.forEach((dep) => console.log(`- ${dep}`));
-
-  // Dynamic progress simulation
-  const resolved = totalPackages + Math.floor(totalPackages * 0.5);
-  const reused = Math.floor(totalPackages * 0.9);
-  const downloaded = 1;
-  const added = totalPackages;
-
-  console.log(`\nPackages: +${totalPackages}`);
-  console.log(
-    "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-  );
-  console.log(
-    `Progress: resolved ${resolved}, reused ${reused}, downloaded ${downloaded}, added ${added}, done\n`
-  );
-
-  console.log(chalk.cyan("dependencies:"));
-  depNames.forEach((name) => {
-    const installed = dependencies[name];
-    const latest = getLatestVersion(name, packageManager);
-    const updateNotice =
-      latest && latest !== installed ? ` (${latest} is available)` : "";
-    console.log(`+ ${name} ${chalk.gray(installed)}${updateNotice}`);
-  });
-
-  console.log(chalk.cyan("\ndevDependencies:"));
-  devDepNames.forEach((name) => {
-    const installed = devDependencies[name];
-    const latest = getLatestVersion(name, packageManager);
-    const updateNotice =
-      latest && latest !== installed ? ` (${latest} is available)` : "";
-    console.log(`+ ${name} ${chalk.gray(installed)}${updateNotice}`);
-  });
 }
 
 async function main() {
@@ -149,9 +81,6 @@ async function main() {
       chalk.yellow("\n⚠ Warning: Some build scripts were ignored.\n")
     );
   }
-
-  printPackageSummary(projectPath, packageManager);
-
   console.log(
     chalk.green(
       `Done in ${chalk.cyan("~10s")} using ${chalk.cyan(packageManager)}.`
