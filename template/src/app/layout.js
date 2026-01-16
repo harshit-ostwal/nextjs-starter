@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
+import inter from "@/fonts/fonts";
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "@/providers/QueryProvider";
-import { manrope, figtree, inter } from "@/styles/fonts";
 import "@/styles/globals.css";
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 
@@ -59,10 +59,8 @@ export default function RootLayout({ children }) {
 
             <body
                 className={cn(
-                    manrope.variable,
-                    figtree.variable,
                     inter.variable,
-                    "font-Manrope tracking-tighter antialiased"
+                    "font-Inter tracking-tighter antialiased"
                 )}
             >
                 <QueryProvider>{children}</QueryProvider>
