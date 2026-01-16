@@ -1,19 +1,11 @@
-import { Button } from "@/components/ui/button";
-import Container from "@/components/ui/container";
-import { Heading } from "@/components/ui/headings";
-import Link from "next/link";
+"use client";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function NotFound() {
-    return (
-        <Container
-            className={
-                "flex h-screen flex-col items-center justify-center gap-4"
-            }
-        >
-            <Heading size="h4">404 - Page Not Found</Heading>
-            <Link href={"/"}>
-                <Button>Go Back</Button>
-            </Link>
-        </Container>
-    );
+    const router = useRouter();
+
+    useEffect(() => {
+        return router.replace("/");
+    }, [router]);
 }
