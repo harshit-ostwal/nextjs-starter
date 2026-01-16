@@ -2,7 +2,7 @@
     "name": "nextjs-starter-kit",
     "version": "1.0.0",
     "bin": {
-        "create-nextjs-starter": "./bin/cli.js"
+        "create-nextjs-starter": "bin/cli.js"
     },
     "keywords": [
         "react",
