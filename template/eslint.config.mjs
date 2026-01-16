@@ -16,6 +16,7 @@ const eslintConfig = [
             ".next/**",
             "out/**",
             "build/**",
+            "generated/**",
             "next-env.d.ts",
         ],
     },
@@ -24,7 +25,7 @@ const eslintConfig = [
         files: ["**/*.{js,jsx}"],
         languageOptions: {
             parserOptions: {
-                ecmaVersion: 2022,
+                ecmaVersion: 2025,
                 sourceType: "module",
             },
         },
